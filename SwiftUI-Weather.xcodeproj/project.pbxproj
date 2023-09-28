@@ -95,6 +95,7 @@
 		A71CCE142AC2BB1F00E9CEAD /* SwiftUI-Weather */ = {
 			isa = PBXGroup;
 			children = (
+				A760E0B42AC5D07C0093B6CF /* Constants */,
 				A77A8FA62AC35CE70082C335 /* Info.plist */,
 				A71CCE152AC2BB1F00E9CEAD /* SwiftUI_WeatherApp.swift */,
 				A71CCE172AC2BB1F00E9CEAD /* ContentView.swift */,
@@ -127,6 +128,13 @@
 				A71CCE322AC2BB2000E9CEAD /* SwiftUI_WeatherUITestsLaunchTests.swift */,
 			);
 			path = "SwiftUI-WeatherUITests";
+			sourceTree = "<group>";
+		};
+		A760E0B42AC5D07C0093B6CF /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Constants;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

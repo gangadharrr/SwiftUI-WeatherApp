@@ -43,7 +43,6 @@ struct WeatherData: Codable {
     let clouds: CloudData
     let wind: WindData
     let visibility: Int
-    let pop: Int
     let sys: SysData
     let dt_txt: String
 }
@@ -104,7 +103,6 @@ func getCityDetails(cityname:String) async throws -> City? {
     let url = URL(string: "http://api.openweathermap.org/geo/1.0/direct?q=\(cityname)&limit=1&appid=2af789c41b934be69f4777295e83362d")!
     let (data, _) = try await URLSession.shared.data(from: url)
     let wrapper = try JSONDecoder().decode([City].self, from: data)
-    print(wrapper)
     return wrapper[0]
     
 }
@@ -113,9 +111,7 @@ func getWeatherDetails(lat:Double,lon:Double) async throws -> WeatherResponse? {
     let url = URL(string:
                     "https://api.openweathermap.org/data/2.5/forecast?lat=\(lat)&lon=\(lon)&units=metric&appid=2af789c41b934be69f4777295e83362d")!
     let (data, _) = try await URLSession.shared.data(from: url)
-    print(data)
     let wrapper = try JSONDecoder().decode(WeatherResponse.self, from: data)
-   print(wrapper)
     return wrapper
 }
 func stringToDate(dateString: String) -> Date? {
@@ -141,10 +137,7 @@ struct ContentView: View {
                         .padding()
                 }
                 else{
-                    Text("Error")
-                        .font(.system(size: 32, weight: .medium, design: .default))
-                        .foregroundColor(.white)
-                        .padding()
+                   ProgressView()
                 }
                 
                 VStack(spacing: 5){
@@ -154,16 +147,13 @@ struct ContentView: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 180,height:180)
                     if let cityweather{
-                        Text(String(cityweather.list[0].main.temp)+"°")
+                        Text(String(cityweather.list[0].main.temp)+"°C")
                             .font(.system(size: 70,weight: .medium))
                             .foregroundColor(.white)
                         Spacer(minLength: 70)
                     }
                     else{
-                        Text("Error")
-                            .font(.system(size: 70,weight: .medium))
-                            .foregroundColor(.white)
-                        Spacer(minLength: 70)
+                        ProgressView().frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/,height: 100)
                     }
                    
                 }
@@ -172,15 +162,7 @@ struct ContentView: View {
                     
                     ForEach(0..<4,id:\.self){num in
                             let _d=cityweather?.list[num]
-                            let calendar = Calendar.current
                             if let _d{
-                                let inputDate=stringToDate(dateString: _d.dt_txt)!
-                                
-                                let weekday = calendar.component(.weekday, from: inputDate)
-                                let dateFormatter = DateFormatter()
-                                 let shortWeekdayName = dateFormatter.shortWeekdaySymbols[weekday - 1]
-
-                               
                                 SmallView(weekday:String(String(_d.dt_txt.split(separator: " ")[1]).split(separator: ":")[0]),temperature:_d.main.temp, imagename:"cloud.sun.fill")
                             
                         }
@@ -196,7 +178,7 @@ struct ContentView: View {
                    Spacer()
                 }.task(priority:.high){
                     do{
-                        city = try await getCityDetails(cityname: "delhi")
+                        city = try await getCityDetails(cityname: "anantapur")
                         if let city{
                             cityweather=try await getWeatherDetails(lat:city.lat,lon:city.lon)
                         }
