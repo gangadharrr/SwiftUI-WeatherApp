@@ -14,6 +14,7 @@
 		A71CCE272AC2BB2000E9CEAD /* SwiftUI_WeatherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71CCE262AC2BB2000E9CEAD /* SwiftUI_WeatherTests.swift */; };
 		A71CCE312AC2BB2000E9CEAD /* SwiftUI_WeatherUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71CCE302AC2BB2000E9CEAD /* SwiftUI_WeatherUITests.swift */; };
 		A71CCE332AC2BB2000E9CEAD /* SwiftUI_WeatherUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71CCE322AC2BB2000E9CEAD /* SwiftUI_WeatherUITestsLaunchTests.swift */; };
+		A760E0B82AC6AC250093B6CF /* LocationSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A760E0B72AC6AC250093B6CF /* LocationSearchView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		A71CCE2C2AC2BB2000E9CEAD /* SwiftUI-WeatherUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SwiftUI-WeatherUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A71CCE302AC2BB2000E9CEAD /* SwiftUI_WeatherUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUI_WeatherUITests.swift; sourceTree = "<group>"; };
 		A71CCE322AC2BB2000E9CEAD /* SwiftUI_WeatherUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUI_WeatherUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		A760E0B72AC6AC250093B6CF /* LocationSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchView.swift; sourceTree = "<group>"; };
 		A77A8FA62AC35CE70082C335 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -101,6 +103,7 @@
 				A71CCE172AC2BB1F00E9CEAD /* ContentView.swift */,
 				A71CCE192AC2BB2000E9CEAD /* Assets.xcassets */,
 				A71CCE1B2AC2BB2000E9CEAD /* Preview Content */,
+				A760E0B72AC6AC250093B6CF /* LocationSearchView.swift */,
 			);
 			path = "SwiftUI-Weather";
 			sourceTree = "<group>";
@@ -268,6 +271,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A71CCE182AC2BB1F00E9CEAD /* ContentView.swift in Sources */,
+				A760E0B82AC6AC250093B6CF /* LocationSearchView.swift in Sources */,
 				A71CCE162AC2BB1F00E9CEAD /* SwiftUI_WeatherApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

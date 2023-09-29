@@ -7,9 +7,66 @@
 
 import SwiftUI
 import Foundation
+
+func WeatherIcon(icon:String,dayTime:Int)->String{
+    
+    let iconDayType: [String:String] = ["Thunderstorm":"cloud.bolt.rain.fill",
+                                        "Rain": "cloud.sun.rain.fill",
+                                        "Drizzle":"cloud.drizzle.fill",
+                                        "Snow":"snowflake",
+                                        "Mist":"cloud.fog.fill",
+                                        "Smoke":"cloud.fog.fill",
+                                        "Haze":"cloud.fog.fill",
+                                        "Dust":"cloud.fog.fill",
+                                        "Fog":"cloud.fog.fill",
+                                        "Sand":"cloud.fog.fill",
+                                        "Ash":"cloud.fog.fill",
+                                        "Squall":"cloud.fog.fill",
+                                        "Tornado":"cloud.fog.fill",
+                                        "Clear":"sun.max.fill",
+                                        "Clouds":"cloud.sun.fill"
+                                        ]
+    let iconNightType: [String:String] = ["Thunderstorm":"cloud.bolt.rain.fill",
+                                          "Rain": "cloud.moon.rain.fill",
+                                          "Drizzle":"cloud.drizzle.fill",
+                                          "Snow":"snowflake",
+                                          "Mist":"cloud.fog.fill",
+                                          "Smoke":"cloud.fog.fill",
+                                          "Haze":"cloud.fog.fill",
+                                          "Dust":"cloud.fog.fill",
+                                          "Fog":"cloud.fog.fill",
+                                          "Sand":"cloud.fog.fill",
+                                          "Ash":"cloud.fog.fill",
+                                          "Squall":"cloud.fog.fill",
+                                          "Tornado":"cloud.fog.fill",
+                                          "Clear":"moon.fill",
+                                          "Clouds":"cloud.moon.fill"
+                                            ]
+    if(dayTime<18 && dayTime>=6){
+        if let item = iconDayType["Rain"]
+        {
+            return item
+        }
+        else{
+            return "sun.max.trianglebadge.exclamationmark.fill"
+        }
+    }
+    else
+    {
+        if let item = iconNightType["Rain"]
+        {
+            return item
+        }
+        else{
+            return "sun.max.trianglebadge.exclamationmark.fill"
+        }
+
+    }
+    
+}
 func SmallView(weekday:String,temperature:Double,imagename:String) -> some View {
     VStack(spacing: 15){
-        if let item = Int(weekday, radix: 10)! >= 12 ? " am": " pm"{
+        if let item = Int(weekday, radix: 10)! >= 12 ?" pm": " am"{
             Text(String(Int(weekday, radix: 10)!%12 == 0 ? 12 : Int(weekday, radix: 10)!%12 ) + item  ).font(.system(size: 25, weight: .medium, design: .default)).foregroundColor(.white)
         }
        
@@ -125,79 +182,87 @@ struct ContentView: View {
     @State var city:City?
     @State var cityweather:WeatherResponse?
     @State var emptyDictionary = [String: Int]()
+    @State var showSearchView=false
     var body: some View {
-        ZStack{
-            LinearGradient(gradient: Gradient(colors: [Color.blue,Color("LightBlue")]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea(.all)
-            VStack(){
-                if let city{
-                    Text(city.name)
-                        .font(.system(size: 32, weight: .medium, design: .default))
-                        .foregroundColor(.white)
-                        .padding()
-                }
-                else{
-                   ProgressView()
-                }
-                
-                VStack(spacing: 5){
-                    Image(systemName: "cloud.sun.fill")
-                        .renderingMode(.original)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 180,height:180)
-                    if let cityweather{
-                        Text(String(cityweather.list[0].main.temp)+"°C")
-                            .font(.system(size: 70,weight: .medium))
-                            .foregroundColor(.white)
-                        Spacer(minLength: 70)
-                    }
-                    else{
-                        ProgressView().frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/,height: 100)
-                    }
-                   
-                }
-        
-                HStack(spacing: 20){
-                    
-                    ForEach(0..<4,id:\.self){num in
-                            let _d=cityweather?.list[num]
-                            if let _d{
-                                SmallView(weekday:String(String(_d.dt_txt.split(separator: " ")[1]).split(separator: ":")[0]),temperature:_d.main.temp, imagename:"cloud.sun.fill")
-                            
+        NavigationView{
+            ZStack{
+                LinearGradient(gradient: Gradient(colors: [Color("CustomBlue"),Color("CustomBlue"),Color("CustomGray")]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .ignoresSafeArea(.all)
+                VStack(){
+                    VStack(spacing: 5){
+                        
+                        if let cityweather{
+                            if let city{
+                                Text(city.name)
+                                    .font(.system(size: 32, weight: .medium, design: .default))
+                                    .foregroundColor(.white)
+                                    .padding()
+                            }
+                            Image(systemName: WeatherIcon(icon:cityweather.list[0].weather[0].main, dayTime: Int(String(cityweather.list[0].dt_txt.split(separator: " ")[1]).split(separator: ":")[0])!))
+                                .renderingMode(.original)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 180,height:180)
+                            Text(String(cityweather.list[0].main.temp)+"°C")
+                                .font(.system(size: 70,weight: .medium))
+                                .foregroundColor(.white)
+                            Spacer(minLength: 70)
                         }
+                        else{
+                            Spacer()
+                            ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white)).controlSize(.large)
+
+                        }
+                       
                     }
-                    
-                }
-                VStack{
-                    Spacer()
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                        Text("Change Location").font(.system(size: 20,weight: .medium)).frame(width: 300)
-                    }).padding().background( RoundedRectangle(cornerRadius: 8).fill(Color.white)
-                        .stroke(Color.white, lineWidth: 2))
-                   Spacer()
-                }.task(priority:.high){
-                    do{
-                        city = try await getCityDetails(cityname: "anantapur")
-                        if let city{
-                            cityweather=try await getWeatherDetails(lat:city.lat,lon:city.lon)
+                    HStack(spacing: 20){
+                        
+                        ForEach(0..<4,id:\.self){num in
+                                let _d=cityweather?.list[num]
+                                if let _d{
+                                    SmallView(weekday:String(String(_d.dt_txt.split(separator: " ")[1]).split(separator: ":")[0]),temperature:_d.main.temp, imagename: WeatherIcon(icon: _d.weather[0].main, dayTime: Int(String(_d.dt_txt.split(separator: " ")[1]).split(separator: ":")[0])!))
+                                
+                            }
                         }
                         
-                    }catch{
-                        cityweather=nil
-                        city=nil
+                    }
+                    VStack{
+                        Spacer()
+                        NavigationLink("", destination:  LocationSearchView(), isActive: $showSearchView)
+                        Button("Change Location", systemImage:"location.fill" , action:{showSearchView=true}).font(.system(size: 20,weight: .medium)).frame(width: 300)
+                        .padding().background( RoundedRectangle(cornerRadius: 8).fill(Color.white)
+                            .stroke(Color.white, lineWidth: 2))
+                       Spacer()
+                    }.task(priority:.high){
+                        do{
+                            city = try await getCityDetails(cityname: "anantapur")
+                            if let city{
+                                cityweather=try await getWeatherDetails(lat:city.lat,lon:city.lon)
+                            }
+                            
+                        }catch{
+                            cityweather=nil
+                            city=nil
+                        }
                     }
                 }
+                
+               }
             }
-            
-           }
         }
+       
         
 }
 
 
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            ContentView()
+            
+            ContentView()
+                .environment(\.colorScheme, .dark)
+        }
+    }
 }
-
