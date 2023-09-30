@@ -179,11 +179,14 @@ func stringToDate(dateString: String) -> Date? {
 }
 
 struct ContentView: View {
-    @State var city:City?
-    @State var cityweather:WeatherResponse?
+    @Binding var Location:String?
+    @State var city:City? = nil
+    @State var cityweather:WeatherResponse? = nil
     @State var emptyDictionary = [String: Int]()
     @State var showSearchView=false
+    
     var body: some View {
+        
         NavigationView{
             ZStack{
                 LinearGradient(gradient: Gradient(colors: [Color("CustomBlue"),Color("CustomBlue"),Color("CustomGray")]), startPoint: .topLeading, endPoint: .bottomTrailing)
@@ -211,16 +214,16 @@ struct ContentView: View {
                         else{
                             Spacer()
                             ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white)).controlSize(.large)
-
+                            
                         }
-                       
+                        
                     }
                     HStack(spacing: 20){
                         
                         ForEach(0..<4,id:\.self){num in
-                                let _d=cityweather?.list[num]
-                                if let _d{
-                                    SmallView(weekday:String(String(_d.dt_txt.split(separator: " ")[1]).split(separator: ":")[0]),temperature:_d.main.temp, imagename: WeatherIcon(icon: _d.weather[0].main, dayTime: Int(String(_d.dt_txt.split(separator: " ")[1]).split(separator: ":")[0])!))
+                            let _d=cityweather?.list[num]
+                            if let _d{
+                                SmallView(weekday:String(String(_d.dt_txt.split(separator: " ")[1]).split(separator: ":")[0]),temperature:_d.main.temp, imagename: WeatherIcon(icon: _d.weather[0].main, dayTime: Int(String(_d.dt_txt.split(separator: " ")[1]).split(separator: ":")[0])!))
                                 
                             }
                         }
@@ -228,14 +231,14 @@ struct ContentView: View {
                     }
                     VStack{
                         Spacer()
-                        NavigationLink("", destination:  LocationSearchView(), isActive: $showSearchView)
-                        Button("Change Location", systemImage:"location.fill" , action:{showSearchView=true}).font(.system(size: 20,weight: .medium)).frame(width: 300)
-                        .padding().background( RoundedRectangle(cornerRadius: 8).fill(Color.white)
-                            .stroke(Color.white, lineWidth: 2))
-                       Spacer()
+                       
+                        NavigationLink("", destination: LocationSearchView(), isActive: $showSearchView)
+                        Button("Change Location", systemImage:"location.fill" , action:{showSearchView.toggle()}).font(.system(size: 20,weight: .medium)).frame(width: 300)
+                            .padding().background( RoundedRectangle(cornerRadius: 8).fill(Color.white))
+                        Spacer()
                     }.task(priority:.high){
                         do{
-                            city = try await getCityDetails(cityname: "anantapur")
+                            city = try await getCityDetails(cityname: Location!)
                             if let city{
                                 cityweather=try await getWeatherDetails(lat:city.lat,lon:city.lon)
                             }
@@ -246,11 +249,15 @@ struct ContentView: View {
                         }
                     }
                 }
+                //                if(showSearchView){
+                //                    LocationSearchView()
+                //                }
                 
-               }
             }
         }
-       
+    }
+        
+    
         
 }
 
@@ -259,9 +266,9 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ContentView()
+            ContentView(Location:.constant("chennai"))
             
-            ContentView()
+            ContentView(Location: .constant("chennai"))
                 .environment(\.colorScheme, .dark)
         }
     }
