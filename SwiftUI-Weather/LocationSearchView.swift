@@ -28,6 +28,8 @@ struct LocationSearchView: View {
                                 isEditing=true
                                 isFocused=true
                             }.focused($isFocused)
+                            .transition(.move(edge: .trailing))
+                            .animation(.easeInOut)
                         if isEditing {
                             Button(action: {
                                 self.isEditing=false
@@ -37,9 +39,8 @@ struct LocationSearchView: View {
                                 Text("Cancel")
                             })
                             .padding(.trailing, 10)
-                            .transition(.move(edge: .leading))
                             .transition(.move(edge: .trailing))
-                            .animation(/*@START_MENU_TOKEN@*/.easeIn/*@END_MENU_TOKEN@*/, value: 0.5)
+                            .animation(.easeInOut)
                         }
                     }.padding(.top,20)
                         Button("Search", systemImage:"location.magnifyingglass" , action:{

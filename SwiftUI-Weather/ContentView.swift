@@ -232,7 +232,6 @@ struct ContentView: View {
                                 cityweather=nil
                             }
                         }
-                       
                     }, content: {
                         LocationSearchView(Location:$Location)
                     })
