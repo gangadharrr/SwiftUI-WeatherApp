@@ -11,9 +11,10 @@ struct LocationSearchView: View {
     @State var text=""
     @State private var isEditing = false
     @FocusState private var isFocused: Bool
-    @Environment(\.dismiss) private var dismiss
+    var onDismiss: ((_ model: String) -> Void)?
+    @Binding var Location:String
+    @Environment(\.presentationMode) var presentationMode
     var body: some View {
-        NavigationView{
             ZStack{
                 VStack{
                     HStack{
@@ -36,25 +37,27 @@ struct LocationSearchView: View {
                                 Text("Cancel")
                             })
                             .padding(.trailing, 10)
+                            .transition(.move(edge: .leading))
                             .transition(.move(edge: .trailing))
                             .animation(/*@START_MENU_TOKEN@*/.easeIn/*@END_MENU_TOKEN@*/, value: 0.5)
                         }
-                    }
-                    NavigationLink("",destination:ContentView(Location: .constant("pune")))
+                    }.padding(.top,20)
                         Button("Search", systemImage:"location.magnifyingglass" , action:{
-                            dismiss()
+                            Location=text
+                            onDismiss?(Location)
+                            presentationMode.wrappedValue.dismiss()
                             }).foregroundColor(.white).padding(10).background( RoundedRectangle(cornerRadius: 8).fill(Color.blue)
                             )
-                    
+
                     Spacer()
                 }
                 
             }
         }
             
-    }
+    
 }
 
 #Preview {
-    LocationSearchView()
+    LocationSearchView(Location: .constant("Pune"))
 }

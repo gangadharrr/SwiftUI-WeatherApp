@@ -153,23 +153,16 @@ struct CoordData: Codable {
     let lon: Double
 }
 
-
-
-func getCityDetails(cityname:String) async throws -> City? {
-    
+func getWeatherDetails(cityname:String) async throws -> WeatherResponse? {
     let url = URL(string: "http://api.openweathermap.org/geo/1.0/direct?q=\(cityname)&limit=1&appid=2af789c41b934be69f4777295e83362d")!
     let (data, _) = try await URLSession.shared.data(from: url)
     let wrapper = try JSONDecoder().decode([City].self, from: data)
-    return wrapper[0]
-    
-}
-func getWeatherDetails(lat:Double,lon:Double) async throws -> WeatherResponse? {
- 
-    let url = URL(string:
-                    "https://api.openweathermap.org/data/2.5/forecast?lat=\(lat)&lon=\(lon)&units=metric&appid=2af789c41b934be69f4777295e83362d")!
-    let (data, _) = try await URLSession.shared.data(from: url)
-    let wrapper = try JSONDecoder().decode(WeatherResponse.self, from: data)
-    return wrapper
+    var _wrapper=wrapper.isEmpty ? City(name: "empty", lat: 0.0, lon: 0.0) : wrapper[0]
+    let _url = URL(string:
+                    "https://api.openweathermap.org/data/2.5/forecast?lat=\(_wrapper.lat)&lon=\(_wrapper.lon)&units=metric&appid=2af789c41b934be69f4777295e83362d")!
+    let (_data, _) = try await URLSession.shared.data(from: _url)
+    let result = try JSONDecoder().decode(WeatherResponse.self, from: _data)
+    return result
 }
 func stringToDate(dateString: String) -> Date? {
   let dateFormatter = DateFormatter()
@@ -179,28 +172,25 @@ func stringToDate(dateString: String) -> Date? {
 }
 
 struct ContentView: View {
-    @Binding var Location:String?
+    @State var Location:String
     @State var city:City? = nil
     @State var cityweather:WeatherResponse? = nil
     @State var emptyDictionary = [String: Int]()
-    @State var showSearchView=false
+    @State var showSearchView=true
     
     var body: some View {
-        
-        NavigationView{
             ZStack{
                 LinearGradient(gradient: Gradient(colors: [Color("CustomBlue"),Color("CustomBlue"),Color("CustomGray")]), startPoint: .topLeading, endPoint: .bottomTrailing)
                     .ignoresSafeArea(.all)
                 VStack(){
                     VStack(spacing: 5){
-                        
                         if let cityweather{
-                            if let city{
-                                Text(city.name)
-                                    .font(.system(size: 32, weight: .medium, design: .default))
-                                    .foregroundColor(.white)
-                                    .padding()
-                            }
+                            
+                            Text(cityweather.city.name)
+                                .font(.system(size: 32, weight: .medium, design: .default))
+                                .foregroundColor(.white)
+                                .padding()
+                            
                             Image(systemName: WeatherIcon(icon:cityweather.list[0].weather[0].main, dayTime: Int(String(cityweather.list[0].dt_txt.split(separator: " ")[1]).split(separator: ":")[0])!))
                                 .renderingMode(.original)
                                 .resizable()
@@ -231,34 +221,31 @@ struct ContentView: View {
                     }
                     VStack{
                         Spacer()
-                       
-                        NavigationLink("", destination: LocationSearchView(), isActive: $showSearchView)
                         Button("Change Location", systemImage:"location.fill" , action:{showSearchView.toggle()}).font(.system(size: 20,weight: .medium)).frame(width: 300)
                             .padding().background( RoundedRectangle(cornerRadius: 8).fill(Color.white))
                         Spacer()
-                    }.task(priority:.high){
-                        do{
-                            city = try await getCityDetails(cityname: Location!)
-                            if let city{
-                                cityweather=try await getWeatherDetails(lat:city.lat,lon:city.lon)
+                    }.sheet(isPresented: $showSearchView,onDismiss: {
+                        Task{
+                            do{
+                                    cityweather=try await getWeatherDetails(cityname: Location)
+                            }catch{
+                                cityweather=nil
                             }
-                            
+                        }
+                       
+                    }, content: {
+                        LocationSearchView(Location:$Location)
+                    })
+                    .task(priority:.high){
+                        do{
+                                cityweather=try await getWeatherDetails(cityname: Location)
                         }catch{
                             cityweather=nil
-                            city=nil
                         }
                     }
                 }
-                //                if(showSearchView){
-                //                    LocationSearchView()
-                //                }
-                
             }
         }
-    }
-        
-    
-        
 }
 
 
@@ -266,9 +253,9 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ContentView(Location:.constant("chennai"))
+            ContentView(Location:"anantapur")
             
-            ContentView(Location: .constant("chennai"))
+            ContentView(Location: "anantapur")
                 .environment(\.colorScheme, .dark)
         }
     }
